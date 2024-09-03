@@ -34,7 +34,7 @@ namespace Events
             }
             else
             {
-               OnOverdrawnEventHandler(amount - (Balance + SavingAccount.Balance));
+                OnOverdrawnEventHandler(amount - (Balance + SavingAccount.Balance));
             }
         }
     }
@@ -53,11 +53,11 @@ namespace Events
             }
             else
             {
-                //OnOverdrawnEventHandler(amount);
-                MessageBox.Show("Bomj vaxtlardi");
+                OnOverdrawnEventHandler(amount);
+                //MessageBox.Show("Bomj vaxtlardi");
             }
         }
-        
+
         public override void OnOverdrawnEventHandler(decimal subAmount)
         {
             base.OnOverdrawnEventHandler(subAmount);
@@ -74,8 +74,8 @@ namespace Events
         public BankAccount(decimal balance)
         {
             Balance = balance;
-            OverdrawnEventHandler = new EventHandler(OverdrawnEventMethod);      
-        }   
+            OverdrawnEventHandler = new EventHandler(OverdrawnEventMethod);
+        }
 
         public virtual void OnOverdrawnEventHandler(decimal subAmount)
         {
@@ -91,9 +91,20 @@ namespace Events
         public void OverdrawnEventMethod(object sender, EventArgs e)
         {
             OverdrawnEventArgs args = (OverdrawnEventArgs)e;
-            MainAccount bankAccount = (MainAccount)sender;
+            if (sender is MainAccount mainAccount)
+            {
+                MessageBox.Show("Balansinda pul yoxdur " + args.SubAmount + " " + (mainAccount.Balance + mainAccount.SavingAccount.Balance));
+            }
+            else if(sender is SavingAccount savingAccount)
+            {
+                MessageBox.Show("Balansinda pul yoxdur " + args.SubAmount + " " + savingAccount.Balance);
+            }
+            else
+            {
+                throw new Exception("No");
+            }
+ 
 
-            MessageBox.Show("Balansinda pul yoxdur " + args.SubAmount + " " + (bankAccount.Balance + bankAccount.SavingAccount.Balance));
         }
 
         public virtual void Withdraw(decimal amount)
@@ -105,7 +116,7 @@ namespace Events
             else
             {
                 decimal shortfall = amount - Balance;
-                OnOverdrawnEventHandler(shortfall); 
+                OnOverdrawnEventHandler(shortfall);
             }
         }
 
@@ -119,6 +130,6 @@ namespace Events
             SubAmount = subAmount;
         }
 
-        public decimal SubAmount { get; set; }       
+        public decimal SubAmount { get; set; }
     }
 }
